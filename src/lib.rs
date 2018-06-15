@@ -351,8 +351,8 @@ impl GlWindow {
     ///
     /// The easiest way of doing this is to call this method for each `Resized` window event that
     /// is received with the width and height given by the event.
-    pub fn resize(&self, window: Window, width: u32, height: u32) {
-        self.context.context.resize(window, width, height);
+    pub fn resize(&self, width: u32, height: u32) {
+        self.context.context.resize(&self.window, width, height);
     }
 }
 

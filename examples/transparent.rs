@@ -17,7 +17,7 @@ fn main() {
 
     println!("Pixel format of the window's GL context: {:?}", gl_window.get_pixel_format());
 
-    let gl = support::load(&gl_window);
+    let gl = support::load(&gl_window.context());
 
     events_loop.run_forever(|event| {
         println!("{:?}", event);

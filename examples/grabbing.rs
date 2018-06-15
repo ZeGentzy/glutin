@@ -12,7 +12,7 @@ fn main() {
 
     let _ = unsafe { gl_window.make_current() };
 
-    let gl = support::load(&gl_window);
+    let gl = support::load(&gl_window.context());
     let mut grabbed = false;
 
     events_loop.run_forever(|event| {

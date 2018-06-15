@@ -9,11 +9,13 @@ mod gl {
 }
 
 pub struct Gl {
-    gl: gl::Gl
+    gl: gl::Gl,
+    program: gl::types::GLuint,
+    vb: gl::types::GLuint,
 }
 
-pub fn load(gl_window: &glutin::GlWindow) -> Gl {
-    let gl = gl::Gl::load_with(|ptr| gl_window.get_proc_address(ptr) as *const _);
+pub fn load(gl_context: &glutin::Context) -> Gl {
+    let gl = gl::Gl::load_with(|ptr| gl_context.get_proc_address(ptr) as *const _);
 
     let version = unsafe {
         let data = CStr::from_ptr(gl.GetString(gl::VERSION) as *const _).to_bytes().to_vec();
@@ -60,12 +62,35 @@ pub fn load(gl_window: &glutin::GlWindow) -> Gl {
                                     (2 * mem::size_of::<f32>()) as *const () as *const _);
         gl.EnableVertexAttribArray(pos_attrib as gl::types::GLuint);
         gl.EnableVertexAttribArray(color_attrib as gl::types::GLuint);
+        
+        Gl {
+            gl,
+            program,
+            vb,
+        }
     }
-
-    Gl { gl: gl }
 }
 
 impl Gl {
+    // Only used for the headless example
+    pub fn reinit(&self) {
+        unsafe {
+            self.gl.UseProgram(self.program);
+            self.gl.BindBuffer(gl::ARRAY_BUFFER, self.vb);
+
+            let pos_attrib = self.gl.GetAttribLocation(self.program, b"position\0".as_ptr() as *const _);
+            let color_attrib = self.gl.GetAttribLocation(self.program, b"color\0".as_ptr() as *const _);
+            self.gl.VertexAttribPointer(pos_attrib as gl::types::GLuint, 2, gl::FLOAT, 0,
+                                        5 * mem::size_of::<f32>() as gl::types::GLsizei,
+                                        ptr::null());
+            self.gl.VertexAttribPointer(color_attrib as gl::types::GLuint, 3, gl::FLOAT, 0,
+                                        5 * mem::size_of::<f32>() as gl::types::GLsizei,
+                                        (2 * mem::size_of::<f32>()) as *const () as *const _);
+            self.gl.EnableVertexAttribArray(pos_attrib as gl::types::GLuint);
+            self.gl.EnableVertexAttribArray(color_attrib as gl::types::GLuint);
+        }
+    }
+
     pub fn draw_frame(&self, color: [f32; 4]) {
         unsafe {
             self.gl.ClearColor(color[0], color[1], color[2], color[3]);

@@ -5,19 +5,26 @@ mod support;
 use glutin::GlContext;
 
 fn main() {
+    // Create a new headless context
+    let context_builder = glutin::ContextBuilder::new();
+    let headless_context = glutin::Context::new(context_builder, true).unwrap();
+
+    // Create a windowed context sharing objects with the headless context
     let mut events_loop = glutin::EventsLoop::new();
-    let window = glutin::WindowBuilder::new().with_title("A fantastic window!");
-    let context = glutin::ContextBuilder::new();
+    let window = glutin::WindowBuilder::new().with_title("Windowed Context");
+    let context = glutin::ContextBuilder::new().with_shared_lists(&headless_context);
     let gl_window = glutin::GlWindow::new(window, context, &events_loop).unwrap();
 
-    let _ = unsafe { gl_window.make_current() };
+    // Load something with the headless context
+    let _ = unsafe { headless_context.make_current() };
+    let gl = support::load(&headless_context);
 
-    println!("Pixel format of the window's GL context: {:?}", gl_window.get_pixel_format());
+    // Switch to the windowed context
+    let _ = unsafe { gl_window.context().make_current() };
 
-    let gl = support::load(&gl_window.context());
+    gl.reinit();
 
     events_loop.run_forever(|event| {
-        println!("{:?}", event);
         match event {
             glutin::Event::WindowEvent { event, .. } => match event {
                 glutin::WindowEvent::CloseRequested => return glutin::ControlFlow::Break,

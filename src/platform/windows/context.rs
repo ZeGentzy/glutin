@@ -73,7 +73,7 @@ impl Context {
     }
 
     #[inline]
-    pub fn resize(&self, _width: u32, _height: u32) {
+    pub fn resize(&self, _window: &winit::Window, _width: u32, _height: u32) {
         // Method is for API consistency.
     }
 

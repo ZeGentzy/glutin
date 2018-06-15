@@ -12,7 +12,7 @@ fn main() {
 
     unsafe { gl_window.make_current().unwrap() };
 
-    let gl = support::load(&gl_window);
+    let gl = support::load(&gl_window.context());
     let cursors = [
         MouseCursor::Default, MouseCursor::Crosshair, MouseCursor::Hand, MouseCursor::Arrow,
         MouseCursor::Move, MouseCursor::Text, MouseCursor::Wait, MouseCursor::Help,
